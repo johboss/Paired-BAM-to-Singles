@@ -1,0 +1,19 @@
+# Paired BAM to Single strand using samtools, adjust filesearch tail, defult:"*_R_alignments_final.bam"
+
+#+ Strand
+#Filter out "forward"/+ strand alignments from .bam
+#1 align of second read in pair to forward strand (not revearse strand (-F 16)) and index
+#2 align of first read in pair to reverse strand strand ("-F 80" = first in pair and read revere strand) and index
+#3 merge alignments from the + strand (forward strand)
+#4 delete temp files
+#5 Index
+for f in *_R_alignments_final.bam; do filename="${f%%.*}"; samtools view -b -f 128 -F 16 $f > ${filename}.fwd1.bam; samtools index ${filename}.fwd1.bam; samtools  view -b -f 80 $f > ${filename}.fwd2.bam; samtools index ${filename}.fwd2.bam; samtools merge -f ${filename}.fwd.bam ${filename}.fwd1.bam ${filename}.fwd2.bam; rm ${filename}.fwd1.bam*; rm ${filename}.fwd2.bam*; samtools index ${filename}.fwd.bam; done
+
+#- strand
+#Filter out "forward"/+ strand alignments from .bam
+#1 align of second read in pair to reverse strand and index
+#2 align of first read in pair to forward strand strand and index
+#3 merge alignments from the + strand (reverse strand)
+#4 delete temp files
+#5 Index
+for f in *_R_alignments_final.bam; do filename="${f%%.*}"; samtools view -b -f 144 $f > ${filename}.rev1.bam; samtools index ${filename}.rev1.bam; samtools  view -b -f 64 -F 16 $f > ${filename}.rev2.bam; samtools index ${filename}.rev2.bam; samtools merge -f ${filename}.rev.bam ${filename}.rev1.bam ${filename}.rev2.bam; rm ${filename}.rev1.bam*; rm ${filename}.rev2.bam*; samtools index ${filename}.rev.bam; done
